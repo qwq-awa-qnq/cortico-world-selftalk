@@ -74,6 +74,12 @@ Coopanion 的扩展装在 **扩展目录**：`<Coopanion 安装目录>\data\exte
 - 桌宠气泡没有连接（比如桌宠窗口关掉）时，`pet_say` 会回执失败，Coo 仍可以写工作区、设提醒等，不影响插件本身。
 - 参数都来自事件库的最近 500 条，长会话里始终以使用者的最新动作为准。
 
+## 仓库与市场
+
+- GitHub：<https://github.com/qwq-awa-qnq/cortico-world-selftalk>
+- npm 包名：`cortico-world-selftalk`（`keywords` 含 `cortico-world`，`cortico.tags` 为官方标签词表里的 `companion`）
+- 发布到 npm 后，Cortico 官方扩展市场会按 `cortico-world` 关键字自动收录（索引仓库：[Pal-AI-Lab/cortico-extensions](https://github.com/Pal-AI-Lab/cortico-extensions)）；不发布也能用「从本机目录安装」装进 Coopanion。
+
 ## 开发
 
 插件源码是 TypeScript，由 Coopanion 自带的 `tsx` 加载，无需构建。改完源码后，重启 Coo 进程生效（ESM 模块不能在运行中热替换；改 World 实例的内部逻辑可只重启 World）。
