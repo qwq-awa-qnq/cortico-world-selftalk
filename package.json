@@ -1,0 +1,47 @@
+{
+  "name": "cortico-world-selftalk",
+  "version": "0.2.1",
+  "type": "module",
+  "description": "Cortico World: after a configurable quiet time the app wakes the bot with a self-talk line, and the bot decides for itself whether to speak, use its tools, or stay quiet.",
+  "keywords": [
+    "cortico-world",
+    "cortico",
+    "desktop-pet",
+    "companion",
+    "self-talk",
+    "proactive"
+  ],
+  "author": "qwq-awa-qnq",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qwq-awa-qnq/cortico-world-selftalk.git"
+  },
+  "homepage": "https://github.com/qwq-awa-qnq/cortico-world-selftalk#readme",
+  "bugs": {
+    "url": "https://github.com/qwq-awa-qnq/cortico-world-selftalk/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src",
+    "describe.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "cortico": {
+    "kind": "world",
+    "api": 6,
+    "displayName": "自主发言",
+    "tags": [
+      "companion"
+    ],
+    "describe": "describe.json"
+  }
+}

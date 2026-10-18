@@ -1,0 +1,14 @@
+# dependencies
+node_modules/
+
+# logs / local state
+*.log
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode/
+.idea/
+
+# build output (none today, kept for later)
+dist/
