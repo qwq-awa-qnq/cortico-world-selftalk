@@ -1,6 +1,9 @@
 # dependencies
 node_modules/
 
+# npm auth token — never commit
+.npmrc
+
 # logs / local state
 *.log
 .DS_Store
