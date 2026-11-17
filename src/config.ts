@@ -21,6 +21,15 @@ export interface SelfTalkConfigSection extends WorldSection {
   maxRounds: number;
   /** 间隔的随机浮动比例（0–0.5）：实际间隔 = 基准 × (1 + 随机 × jitter)。 */
   jitter: number;
+  /** 勿扰时段，如 "23:00-08:00"；空串表示不设。落在时段里不叫醒。 */
+  quietHours: string;
+  /** 再次叫醒的退避倍数（1–4）：第 n 次再次叫醒的间隔 = repeatMinutes × backoff^(n-1)。 */
+  backoff: number;
+  /**
+   * 自定义提示词：附加在叫醒正文后的一段话，可用 {time} {quiet} {round} {again} 占位符；
+   * 留空表示不加。
+   */
+  customPrompt: string;
 }
 
 /** 各键的缺省值；enabled 恒为 false，是否启用由 bot 声明与部署配置决定。 */
@@ -30,6 +39,9 @@ export const SELFTALK_DEFAULTS: SelfTalkConfigSection = {
   repeatMinutes: 25,
   maxRounds: 0,
   jitter: 0.2,
+  quietHours: '',
+  backoff: 1,
+  customPrompt: '',
 };
 
 /** 配置组：出现在自言自语 World 页，改值立即生效（检查周期里现读）。 */
@@ -73,6 +85,26 @@ export function selftalkConfigGroup(language: Language): ConfigGroup {
           description: t.jitterDescription,
           minimum: 0,
           maximum: 0.5,
+          'x-hot': true,
+        },
+        [`worlds.${SELFTALK_ID}.quietHours`]: {
+          type: 'string',
+          title: t.quietHoursTitle,
+          description: t.quietHoursDescription,
+          'x-hot': true,
+        },
+        [`worlds.${SELFTALK_ID}.backoff`]: {
+          type: 'number',
+          title: t.backoffTitle,
+          description: t.backoffDescription,
+          minimum: 1,
+          maximum: 4,
+          'x-hot': true,
+        },
+        [`worlds.${SELFTALK_ID}.customPrompt`]: {
+          type: 'string',
+          title: t.customPromptTitle,
+          description: t.customPromptDescription,
           'x-hot': true,
         },
       },

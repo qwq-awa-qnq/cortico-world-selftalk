@@ -128,6 +128,75 @@ try {
   expect(typeof stale.render === 'function', '排队事件可渲染');
   activities = [{ type: 'desktop-pet.message', ts: new Date(Date.now() + 5000).toISOString() }];
   expect(stale.render() === null, '排队期间有活动时作废');
+
+  // 退避：rounds=1 时基准不变，rounds=2 起逐次翻倍（backoff=2）
+  // 上面的浮动测试留下了 ≈1.4995 的随机倍数，先归一，让时间断言可预测；
+  // 上一段留下的「未来活动」也要清掉，否则每个 tick 都在重置计数
+  activities = [];
+  world.lastActivitySeen = Date.now() - quiet * 60_000;
+  world.jitterFactor = 1;
+  cfg.backoff = 2;
+  cfg.jitter = 0;
+  activities = [];
+  world.rounds = 1;
+  world.lastNudgeAt = Date.now() - (repeat + 1) * 60_000;
+  world.tick();
+  expect(pushed.length === 11, '退避第一次不再拉长');
+  world.rounds = 2;
+  world.lastNudgeAt = Date.now() - (repeat + 1) * 60_000;
+  world.tick();
+  expect(pushed.length === 11, '退避后未到两倍间隔不叫醒');
+  world.lastNudgeAt = Date.now() - (repeat * 2 + 1) * 60_000;
+  world.tick();
+  expect(pushed.length === 12, '退避后按两倍间隔叫醒');
+  cfg.backoff = 1;
+
+  // 勿扰时段：落在时段里不叫醒，时段外照常
+  // 用「当前分钟」造一个覆盖此刻的窗口，确保现在确实在时段里
+  activities = [];
+  world.lastActivitySeen = Date.now() - quiet * 60_000;
+  const nowMin = new Date().getMinutes();
+  const hh = String(new Date().getHours()).padStart(2, '0');
+  const mm = String(nowMin).padStart(2, '0');
+  cfg.quietHours = `${hh}:${mm}-${hh}:${String((nowMin + 10) % 60).padStart(2, '0')}`;
+  world.rounds = 0;
+  world.jitterFactor = 1;
+  world.lastActivitySeen = Date.now() - (quiet + 3) * 60_000;
+  world.tick();
+  expect(pushed.length === 12, '勿扰时段内不叫醒');
+  // 换一个不覆盖此刻的窗口（当前小时的前一小时整点段）
+  const offHour = String((new Date().getHours() + 23) % 24).padStart(2, '0');
+  cfg.quietHours = `${offHour}:00-${offHour}:59`;
+  world.tick();
+  expect(pushed.length === 13, '勿扰时段外照常叫醒');
+  cfg.quietHours = '不是时间';
+  activities = [];
+  world.rounds = 0;
+  world.lastActivitySeen = Date.now() - (quiet + 3) * 60_000;
+  world.tick();
+  expect(pushed.length === 14, '勿扰时段写坏时当作没设');
+  cfg.quietHours = '';
+
+  // 自定义提示词：原样附在下一行，占位符替换，留空则与内置正文一致
+  cfg.customPrompt = '今天继续写那篇小说;{time} 已经过了 {quiet} 分钟，第 {round} 次。';
+  activities = [];
+  world.rounds = 0;
+  world.jitterFactor = 1;
+  world.lastActivitySeen = Date.now() - (quiet + 3) * 60_000;
+  world.tick();
+  const custom = pushed[pushed.length - 1].render();
+  expect(custom.includes('\n'), '自定义提示词另起一行');
+  expect(custom.includes('今天继续写那篇小说'), '自定义提示词原样出现');
+  expect(custom.includes('第 1 次'), '{round} 已替换');
+  expect(!custom.includes('{time}') && !custom.includes('{quiet}'), '{time}/{quiet} 已替换');
+  cfg.customPrompt = '';
+  activities = [];
+  world.rounds = 0;
+  world.jitterFactor = 1;
+  world.lastActivitySeen = Date.now() - (quiet + 3) * 60_000;
+  world.tick();
+  const plain = pushed[pushed.length - 1].render();
+  expect(!plain.includes('\n'), '留空时正文只有一行（与原来一致）');
 } finally {
   await world.stop();
   rmSync(dir, { recursive: true, force: true });
