@@ -1,6 +1,6 @@
 {
   "name": "cortico-world-selftalk",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "type": "module",
   "description": "Coopanion / Cortico 的自主发言 World 扩展：安静一段时间后叫醒 Coo，由它自己决定开不开口、用什么工具；不想说就继续安静。\n1. 0.3.0 新增：自定义提示词（可用 {time}/{quiet}/{round} 占位符）、勿扰时段、再次叫醒退避、状态灯倒计时。\n2. 推荐搭配：https://github.com/Pal-AI-Lab/cortico-world-qqbot",
   "keywords": [
